@@ -1,0 +1,81 @@
+@startuml diagrama-de-implantacao
+
+skinparam node {
+  BackgroundColor #EEF4FF
+  BorderColor #3366CC
+  FontSize 13
+}
+skinparam component {
+  BackgroundColor #DDEEFF
+  BorderColor #3366CC
+}
+skinparam database {
+  BackgroundColor #FFF8DC
+  BorderColor #CC9900
+}
+skinparam ArrowColor #3366CC
+
+node "Dispositivos do Usuário" {
+  node "Navegador Web\n(Chrome / Firefox)" as BROWSER {
+    component "Frontend App\n(React/HTML)" as FRONTEND
+  }
+  node "Smartphone\n(iOS / Android)" as MOBILE {
+    component "App Mobile\n(PWA)" as MOBILEAPP
+  }
+}
+
+node "Zona Desmilitarizada (DMZ)" {
+  node "Servidor de\nBalanceamento de Carga\n<<Load Balancer>>" as LB {
+    component "Nginx" as NGINX
+  }
+}
+
+node "Cluster de Aplicação\n<<Cloud - AWS / Azure>>" {
+  node "Servidor de Aplicação 1\n<<App Server>>" as APP1 {
+    component "SGO Backend\n(Java Spring Boot)" as BACK1
+  }
+  node "Servidor de Aplicação 2\n<<App Server>>" as APP2 {
+    component "SGO Backend\n(Java Spring Boot)" as BACK2
+  }
+  node "Servidor de API Gateway\n<<Gateway>>" as APIGW {
+    component "API Gateway\n(Kong / AWS API GW)" as GATEWAY
+  }
+}
+
+node "Camada de Dados\n<<Banco de Dados>>" {
+  database "Banco de Dados Principal\n(PostgreSQL - Primário)" as DB_PRIMARY
+  database "Banco de Dados Réplica\n(PostgreSQL - Réplica)" as DB_REPLICA
+  database "Cache\n(Redis)" as CACHE
+}
+
+node "Servidor de Arquivos\n<<Storage>>" {
+  component "Armazenamento de\nRelatórios e Exportações\n(AWS S3 / MinIO)" as STORAGE
+}
+
+node "Servidor de Notificações\n<<E-mail>>" {
+  component "Serviço SMTP\n(SendGrid / SES)" as SMTP
+}
+
+node "Servidor de Monitoramento\n<<Observability>>" {
+  component "Logs & Métricas\n(Grafana + Prometheus)" as MONITOR
+}
+
+BROWSER --> NGINX : HTTPS (443)
+MOBILE --> NGINX : HTTPS (443)
+NGINX --> GATEWAY : HTTP (8080)
+GATEWAY --> BACK1 : HTTP (8081)
+GATEWAY --> BACK2 : HTTP (8081)
+BACK1 --> DB_PRIMARY : JDBC (5432)
+BACK2 --> DB_PRIMARY : JDBC (5432)
+DB_PRIMARY --> DB_REPLICA : Replicação\n(streaming)
+BACK1 --> CACHE : TCP (6379)
+BACK2 --> CACHE : TCP (6379)
+BACK1 --> STORAGE : HTTPS
+BACK2 --> STORAGE : HTTPS
+BACK1 --> SMTP : SMTP (587)
+BACK2 --> SMTP : SMTP (587)
+BACK1 --> MONITOR : métricas
+BACK2 --> MONITOR : métricas
+NGINX --> MONITOR : logs
+
+@enduml

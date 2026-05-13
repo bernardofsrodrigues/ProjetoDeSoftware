@@ -1,0 +1,89 @@
+@startuml diagrama-de-componentes
+
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #EEF4FF
+  BorderColor #3366CC
+  FontSize 13
+}
+skinparam ArrowColor #3366CC
+skinparam interfaceBackgroundColor #FFFFFF
+skinparam interfaceBorderColor #3366CC
+
+package "Interface de Usuário" {
+  [Painel Web (Frontend)] as UI_WEB
+  [Aplicativo Mobile] as UI_MOB
+}
+
+package "API Gateway" {
+  [Gateway / Roteador] as GW
+}
+
+package "Módulo de Competições" {
+  [Gerenciador de Competições] as COMP
+  interface "ICompeticao" as ICOMP
+}
+
+package "Módulo de Inscrições" {
+  [Gerenciador de Inscrições] as INSC
+  interface "IInscricao" as IINSC
+}
+
+package "Módulo de Alocação" {
+  [Gerenciador de Locais] as ALOC
+  interface "IAlocacao" as IALOC
+}
+
+package "Módulo de Resultados" {
+  [Registrador de Resultados] as RESU
+  interface "IResultado" as IRESU
+}
+
+package "Módulo de Relatórios" {
+  [Gerador de Relatórios] as RELA
+  [Exportador (PDF/Excel)] as EXPO
+  interface "IRelatorio" as IRELA
+}
+
+package "Módulo de Notificações" {
+  [Serviço de E-mail] as NOTI
+}
+
+package "Infraestrutura de Dados" {
+  database "Banco de Dados\nRelacional" as BD
+  [ORM / Repositório] as ORM
+}
+
+UI_WEB --> GW : HTTP/REST
+UI_MOB --> GW : HTTP/REST
+
+GW --> ICOMP
+GW --> IINSC
+GW --> IALOC
+GW --> IRESU
+GW --> IRELA
+
+ICOMP -- COMP
+IINSC -- INSC
+IALOC -- ALOC
+IRESU -- RESU
+IRELA -- RELA
+
+COMP --> ORM : persiste/consulta
+INSC --> ORM : persiste/consulta
+ALOC --> ORM : persiste/consulta
+RESU --> ORM : persiste/consulta
+RELA --> ORM : consulta
+
+INSC --> ALOC : verifica disponibilidade
+INSC --> COMP : valida competição
+RESU --> INSC : valida atletas inscritos
+RELA --> RESU : lê resultados
+RELA --> EXPO : delega exportação
+
+INSC --> NOTI : envia confirmação
+RESU --> NOTI : notifica resultados
+
+ORM --> BD : SQL
+
+@enduml

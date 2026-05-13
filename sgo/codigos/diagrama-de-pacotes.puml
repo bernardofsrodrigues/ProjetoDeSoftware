@@ -1,0 +1,97 @@
+@startuml diagrama-de-pacotes
+
+skinparam packageStyle rectangle
+skinparam package {
+  BackgroundColor #EEF4FF
+  BorderColor #3366CC
+  FontSize 13
+}
+skinparam ArrowColor #3366CC
+
+package "sgo" {
+
+  package "presentation" {
+    package "controllers" {
+      class CompeticaoController
+      class AtletaController
+      class LocalController
+      class ResultadoController
+      class RelatorioController
+    }
+    package "views" {
+      class CompeticaoView
+      class AtletaView
+      class LocalView
+      class ResultadoView
+      class RelatorioView
+    }
+  }
+
+  package "application" {
+    package "services" {
+      class CompeticaoService
+      class InscricaoService
+      class AlocacaoService
+      class ResultadoService
+      class RelatorioService
+    }
+    package "dtos" {
+      class CompeticaoDTO
+      class AtletaDTO
+      class InscricaoDTO
+      class ResultadoDTO
+    }
+  }
+
+  package "domain" {
+    package "model" {
+      class Competicao
+      class Atleta
+      class Local
+      class Resultado
+      class Inscricao
+      class Medalha
+      class Pais
+      class RelatorioMedalhas
+    }
+    package "enums" {
+      enum StatusCompeticao
+      enum StatusInscricao
+      enum TipoMedalha
+    }
+    package "repositories" {
+      interface CompeticaoRepository
+      interface AtletaRepository
+      interface LocalRepository
+      interface ResultadoRepository
+      interface InscricaoRepository
+      interface MedalhaRepository
+    }
+  }
+
+  package "infrastructure" {
+    package "persistence" {
+      class CompeticaoRepositoryImpl
+      class AtletaRepositoryImpl
+      class LocalRepositoryImpl
+      class ResultadoRepositoryImpl
+      class InscricaoRepositoryImpl
+      class MedalhaRepositoryImpl
+    }
+    package "config" {
+      class DatabaseConfig
+      class AppConfig
+    }
+    package "external" {
+      class EmailNotificationService
+      class ExportService
+    }
+  }
+}
+
+"presentation" ..> "application" : usa
+"application" ..> "domain" : usa
+"infrastructure" ..|> "domain" : implementa
+"application" ..> "infrastructure" : acessa via interface
+
+@enduml

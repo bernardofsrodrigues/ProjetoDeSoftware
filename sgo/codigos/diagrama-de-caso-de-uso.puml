@@ -1,0 +1,63 @@
+@startuml diagrama-de-caso-de-uso
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #EEF4FF
+  BorderColor #3366CC
+  ArrowColor #3366CC
+}
+
+actor "Organizador" as ORG
+actor "Atleta" as ATL
+actor "Administrador" as ADM
+actor "Sistema Externo\n(Comitê Olímpico)" as EXT
+
+rectangle "Sistema de Gestão das Olimpíadas (SGO)" {
+
+  usecase "UC01 - Cadastrar Competição" as UC01
+  usecase "UC02 - Editar Competição" as UC02
+  usecase "UC03 - Listar Competições" as UC03
+  usecase "UC04 - Inscrever Atleta" as UC04
+  usecase "UC05 - Cancelar Inscrição" as UC05
+  usecase "UC06 - Consultar Inscrições" as UC06
+  usecase "UC07 - Alocar Local" as UC07
+  usecase "UC08 - Verificar Conflito de Horário" as UC08
+  usecase "UC09 - Liberar Local" as UC09
+  usecase "UC10 - Registrar Resultado" as UC10
+  usecase "UC11 - Consultar Resultados" as UC11
+  usecase "UC12 - Gerar Relatório de Medalhas" as UC12
+  usecase "UC13 - Exportar Relatório" as UC13
+  usecase "UC14 - Gerenciar Países" as UC14
+  usecase "UC15 - Gerenciar Atletas" as UC15
+}
+
+ORG --> UC01
+ORG --> UC02
+ORG --> UC03
+ORG --> UC07
+ORG --> UC09
+ORG --> UC10
+ORG --> UC12
+
+ATL --> UC04
+ATL --> UC05
+ATL --> UC06
+ATL --> UC11
+
+ADM --> UC14
+ADM --> UC15
+ADM --> UC13
+ADM --> UC01
+ADM --> UC12
+
+EXT --> UC12
+
+UC01 ..> UC07 : <<include>>
+UC07 ..> UC08 : <<include>>
+UC10 ..> UC11 : <<extend>>
+UC12 ..> UC13 : <<extend>>
+UC04 ..> UC15 : <<include>>
+
+@enduml
